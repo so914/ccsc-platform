@@ -23,129 +23,127 @@ import {
     Trophy,
     Users,
 } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 import AppLogo from './app-logo';
 
 export function AppSidebar() {
-    const { t } = useTranslation('common');
 
-    // Primary navigation - Most frequently used
+    // Navigation principale - La plus fréquemment utilisée
     const mainNavItems: NavItem[] = [
         {
-            title: t('sidebar.nav.dashboard'),
+            title: "Tableau de bord",
             href: dashboard(),
             icon: LayoutGrid,
         },
     ];
 
-    // Master Data - Collapsible menu for data management
+    // Données de référence - Menu déroulant pour la gestion des données
     const masterDataItems: NavItemWithChildren[] = [
         {
-            title: t('sidebar.nav.master_data'),
+            title: "Données de référence",
             icon: Database,
             items: [
                 {
-                    title: t('sidebar.nav.academic_years'),
+                    title: "Années académiques",
                     href: '/admin/master/academic-years',
                 },
                 {
-                    title: t('sidebar.nav.students'),
+                    title: "Étudiants",
                     href: '/admin/master/students',
                 },
                 {
-                    title: t('sidebar.nav.teachers'),
+                    title: "Enseignants",
                     href: '/admin/master/teachers',
                 },
                 {
-                    title: t('sidebar.nav.classrooms'),
+                    title: "Salles de classe",
                     href: '/admin/master/classrooms',
                 },
                 {
-                    title: t('sidebar.nav.subjects'),
+                    title: "Matières",
                     href: '/admin/master/subjects',
                 },
                 {
-                    title: t('sidebar.nav.levels'),
+                    title: "Niveaux",
                     href: '/admin/master/levels',
                 },
                 {
-                    title: t('sidebar.nav.majors'),
+                    title: "Filières",
                     href: '/admin/master/majors',
                 },
                 {
-                    title: t('sidebar.nav.extracurriculars'),
+                    title: "Activités extrascolaires",
                     href: '/admin/master/extracurriculars',
                 },
             ],
         },
     ];
 
-    // PPDB - Student Admission Management
+    // PPDB - Gestion des admissions des étudiants
     const ppdbItems: NavItemWithChildren[] = [
         {
-            title: t('sidebar.nav.ppdb'),
+            title: "Admissions (PPDB)",
             icon: ClipboardList,
             items: [
                 {
-                    title: t('sidebar.nav.periods'),
+                    title: "Périodes",
                     href: '/admin/ppdb/periods',
                 },
                 {
-                    title: t('sidebar.nav.paths'),
+                    title: "Parcours",
                     href: '/admin/ppdb/paths',
                 },
                 {
-                    title: t('sidebar.nav.registrations'),
+                    title: "Inscriptions",
                     href: '/admin/ppdb/registrations',
                 },
                 {
-                    title: t('sidebar.nav.documents'),
+                    title: "Documents",
                     href: '/admin/ppdb/documents',
                 },
                 {
-                    title: t('sidebar.nav.selections'),
+                    title: "Sélections",
                     href: '/admin/ppdb/selections',
                 },
             ],
         },
     ];
 
-    // User & Access Management - Security related
+    // Gestion des utilisateurs & des accès - Sécurité
     const userManagementItems: NavItemWithChildren[] = [
         {
-            title: t('sidebar.nav.user_management'),
+            title: "Gestion des utilisateurs",
             icon: Users,
             items: [
                 {
-                    title: t('sidebar.nav.users'),
+                    title: "Utilisateurs",
                     href: '/admin/users',
                 },
                 {
-                    title: t('sidebar.nav.roles'),
+                    title: "Rôles",
                     href: '/admin/roles',
                 },
                 {
-                    title: t('sidebar.nav.permissions'),
+                    title: "Permissions",
                     href: '/admin/permissions',
                 },
             ],
         },
     ];
 
-    // System administration items
+    // Éléments d'administration système
     const systemItems: NavItem[] = [
         {
-            title: t('sidebar.nav.activity_logs'),
+            title: "Journaux d'activité",
             href: '/admin/activity-logs',
             icon: Activity,
         },
         {
-            title: t('sidebar.nav.media_library'),
+            title: "Médiathèque",
             href: '/admin/media',
             icon: Image,
         },
         {
-            title: t('sidebar.nav.settings'),
+            title: "Paramètres",
             href: '/admin/settings',
             icon: Settings,
         },
@@ -166,20 +164,20 @@ export function AppSidebar() {
             </SidebarHeader>
 
             <SidebarContent>
-                {/* Primary Navigation */}
-                <NavMain items={mainNavItems} label={t('sidebar.labels.menu')} />
+                {/* Navigation principale */}
+                <NavMain items={mainNavItems} label="Menu" />
 
-                {/* Academic Data Management */}
-                <NavCollapsible items={masterDataItems} label={t('sidebar.labels.academic')} />
+                {/* Gestion des données académiques */}
+                <NavCollapsible items={masterDataItems} label="Académique" />
 
-                {/* PPDB - Student Admission */}
-                <NavCollapsible items={ppdbItems} label={t('sidebar.labels.admission')} />
+                {/* PPDB - Admission des étudiants */}
+                <NavCollapsible items={ppdbItems} label="Admission" />
 
-                {/* Access Control */}
-                <NavCollapsible items={userManagementItems} label={t('sidebar.labels.access_control')} />
+                {/* Contrôle des accès */}
+                <NavCollapsible items={userManagementItems} label="Contrôle des accès" />
 
-                {/* System Administration */}
-                <NavMain items={systemItems} label={t('sidebar.labels.system')} />
+                {/* Administration système */}
+                <NavMain items={systemItems} label="Système" />
             </SidebarContent>
 
             <SidebarFooter>
