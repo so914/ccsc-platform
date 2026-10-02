@@ -93,6 +93,20 @@ export default function Register() {
                                 />
                             </div>
 
+                            <div className="grid gap-2">
+                                <Label htmlFor="account_type">Type de compte</Label>
+                                <select
+                                    id="account_type"
+                                    name="account_type"
+                                    defaultValue="challenger"
+                                    className="border-input bg-background h-9 w-full rounded-md border px-3 text-sm"
+                                >
+                                    <option value="challenger">Challenger (candidat au concours)</option>
+                                    <option value="participant">Participant (ateliers)</option>
+                                </select>
+                                <InputError message={errors.account_type} />
+                            </div>
+
                             <Button
                                 type="submit"
                                 className="mt-2 w-full"

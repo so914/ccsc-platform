@@ -1,4 +1,3 @@
-import { NavCollapsible } from '@/components/nav-collapsible';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import {
@@ -11,143 +10,174 @@ import {
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
-import { type NavItem, type NavItemWithChildren } from '@/types';
-import { Link } from '@inertiajs/react';
+import { type NavItem, type SharedData } from '@/types';
+import { Link, usePage } from '@inertiajs/react';
 import {
     Activity,
+    BookOpen,
+    CalendarDays,
     ClipboardList,
-    Database,
+    Crown,
+    FileText,
+    Flag,
+    FolderOpen,
     Image,
+    KeyRound,
     LayoutGrid,
+    Library,
+    ListOrdered,
+    Medal,
     Settings,
+    Shield,
+    Tag,
     Trophy,
+    User,
+    UserCheck,
+    UserCog,
     Users,
 } from 'lucide-react';
 import AppLogo from './app-logo';
 
+type Item = NavItem & { permission?: string };
+
+interface Group {
+    label: string;
+    items: Item[];
+}
+
+const home: Item = { title: 'Tableau de bord', href: dashboard(), icon: LayoutGrid };
+
+const adminGroups: Group[] = [
+    { label: 'Menu', items: [home] },
+    {
+        label: 'Concours',
+        items: [
+            { title: 'Concours', href: '/admin/contests', icon: Trophy, permission: 'contests.view' },
+            { title: 'Catégories', href: '/admin/categories', icon: Tag, permission: 'categories.view' },
+            { title: 'Examens', href: '/admin/exams', icon: FileText, permission: 'exams.view' },
+            { title: 'Challenges', href: '/admin/challenges', icon: Flag, permission: 'challenges.view' },
+            { title: 'Banques de questions', href: '/admin/question-banks', icon: Library, permission: 'question-banks.view' },
+        ],
+    },
+    {
+        label: 'Candidats',
+        items: [
+            { title: 'Challengers', href: '/admin/challengers', icon: Users, permission: 'challengers.view' },
+            { title: 'Participants', href: '/admin/participants', icon: User, permission: 'participants.view' },
+            { title: 'Inscriptions', href: '/admin/registrations', icon: ClipboardList, permission: 'registrations.manage' },
+        ],
+    },
+    {
+        label: 'Résultats',
+        items: [
+            { title: 'Résultats', href: '/admin/results', icon: FileText, permission: 'results.view' },
+            { title: 'Classements', href: '/admin/rankings', icon: ListOrdered, permission: 'rankings.view' },
+            { title: 'Finalistes', href: '/admin/finalists', icon: Medal, permission: 'finalists.view' },
+            { title: 'Gagnants', href: '/admin/winners', icon: Crown, permission: 'finalists.view' },
+        ],
+    },
+    {
+        label: 'Ateliers',
+        items: [
+            { title: 'Ateliers', href: '/admin/workshops', icon: CalendarDays, permission: 'workshops.view' },
+            { title: 'Inscriptions aux ateliers', href: '/admin/workshop-registrations', icon: ClipboardList, permission: 'workshops.view' },
+        ],
+    },
+    {
+        label: 'Administration',
+        items: [
+            { title: 'Utilisateurs', href: '/admin/users', icon: Users, permission: 'users.view' },
+            { title: 'Agents', href: '/admin/agents', icon: UserCog, permission: 'agents.view' },
+            { title: 'Rôles', href: '/admin/roles', icon: Shield, permission: 'roles.view' },
+            { title: 'Permissions', href: '/admin/permissions', icon: KeyRound, permission: 'permissions.view' },
+            { title: "Journaux d'activité", href: '/admin/activity-logs', icon: Activity, permission: 'activity-logs.view' },
+            { title: 'Médias', href: '/admin/media', icon: Image, permission: 'settings.view' },
+            { title: 'Paramètres', href: '/admin/settings', icon: Settings, permission: 'settings.view' },
+        ],
+    },
+];
+
+const agentGroups: Group[] = [
+    { label: 'Menu', items: [home] },
+    {
+        label: 'Mes concours',
+        items: [
+            { title: 'Concours', href: '/agent/contests', icon: Trophy, permission: 'contests.view' },
+            { title: 'Examens', href: '/agent/exams', icon: FileText, permission: 'exams.view' },
+            { title: 'Challenges', href: '/agent/challenges', icon: Flag, permission: 'challenges.view' },
+            { title: 'Banque de questions', href: '/agent/question-banks', icon: Library, permission: 'question-banks.view' },
+        ],
+    },
+    {
+        label: 'Candidats',
+        items: [
+            { title: 'Challengers', href: '/agent/challengers', icon: Users, permission: 'challengers.view' },
+            { title: 'Résultats', href: '/agent/results', icon: FileText, permission: 'results.view' },
+        ],
+    },
+    {
+        label: 'Classements',
+        items: [{ title: 'Classements', href: '/agent/rankings', icon: ListOrdered, permission: 'rankings.view' }],
+    },
+];
+
+const challengerGroups: Group[] = [
+    { label: 'Menu', items: [home] },
+    {
+        label: 'Mon concours',
+        items: [{ title: 'Mon concours', href: '/challenger/contests', icon: Trophy }],
+    },
+    {
+        label: 'Examens',
+        items: [{ title: 'Examens', href: '/challenger/exams', icon: FileText }],
+    },
+    {
+        label: 'Mes résultats',
+        items: [
+            { title: 'Mes résultats', href: '/challenger/results', icon: ClipboardList },
+            { title: 'Classement', href: '/challenger/ranking', icon: ListOrdered },
+        ],
+    },
+    {
+        label: 'Compte',
+        items: [{ title: 'Mon profil', href: '/settings/profile', icon: User }],
+    },
+];
+
+const participantGroups: Group[] = [
+    { label: 'Menu', items: [home] },
+    {
+        label: 'Ateliers',
+        items: [
+            { title: 'Mes ateliers', href: '/participant/workshops', icon: CalendarDays },
+            { title: 'Ressources', href: '/participant/resources', icon: FolderOpen },
+            { title: 'Mes participations', href: '/participant/participations', icon: UserCheck },
+        ],
+    },
+    {
+        label: 'Compte',
+        items: [{ title: 'Mon profil', href: '/settings/profile', icon: User }],
+    },
+];
+
+function groupsFor(roles: string[]): Group[] {
+    if (roles.includes('admin')) return adminGroups;
+    if (roles.includes('agent')) return agentGroups;
+    if (roles.includes('challenger')) return challengerGroups;
+    if (roles.includes('participant')) return participantGroups;
+    return [{ label: 'Menu', items: [home, { title: 'Aide', href: '/', icon: BookOpen }] }];
+}
+
 export function AppSidebar() {
+    const { auth } = usePage<SharedData>().props;
+    const isAdmin = auth.roles.includes('admin');
 
-    // Navigation principale - La plus fréquemment utilisée
-    const mainNavItems: NavItem[] = [
-        {
-            title: "Tableau de bord",
-            href: dashboard(),
-            icon: LayoutGrid,
-        },
-    ];
-
-    // Données de référence - Menu déroulant pour la gestion des données
-    const masterDataItems: NavItemWithChildren[] = [
-        {
-            title: "Données de référence",
-            icon: Database,
-            items: [
-                {
-                    title: "Années académiques",
-                    href: '/admin/master/academic-years',
-                },
-                {
-                    title: "Étudiants",
-                    href: '/admin/master/students',
-                },
-                {
-                    title: "Enseignants",
-                    href: '/admin/master/teachers',
-                },
-                {
-                    title: "Salles de classe",
-                    href: '/admin/master/classrooms',
-                },
-                {
-                    title: "Matières",
-                    href: '/admin/master/subjects',
-                },
-                {
-                    title: "Niveaux",
-                    href: '/admin/master/levels',
-                },
-                {
-                    title: "Filières",
-                    href: '/admin/master/majors',
-                },
-                {
-                    title: "Activités extrascolaires",
-                    href: '/admin/master/extracurriculars',
-                },
-            ],
-        },
-    ];
-
-    // PPDB - Gestion des admissions des étudiants
-    const ppdbItems: NavItemWithChildren[] = [
-        {
-            title: "Admissions (PPDB)",
-            icon: ClipboardList,
-            items: [
-                {
-                    title: "Périodes",
-                    href: '/admin/ppdb/periods',
-                },
-                {
-                    title: "Parcours",
-                    href: '/admin/ppdb/paths',
-                },
-                {
-                    title: "Inscriptions",
-                    href: '/admin/ppdb/registrations',
-                },
-                {
-                    title: "Documents",
-                    href: '/admin/ppdb/documents',
-                },
-                {
-                    title: "Sélections",
-                    href: '/admin/ppdb/selections',
-                },
-            ],
-        },
-    ];
-
-    // Gestion des utilisateurs & des accès - Sécurité
-    const userManagementItems: NavItemWithChildren[] = [
-        {
-            title: "Gestion des utilisateurs",
-            icon: Users,
-            items: [
-                {
-                    title: "Utilisateurs",
-                    href: '/admin/users',
-                },
-                {
-                    title: "Rôles",
-                    href: '/admin/roles',
-                },
-                {
-                    title: "Permissions",
-                    href: '/admin/permissions',
-                },
-            ],
-        },
-    ];
-
-    // Éléments d'administration système
-    const systemItems: NavItem[] = [
-        {
-            title: "Journaux d'activité",
-            href: '/admin/activity-logs',
-            icon: Activity,
-        },
-        {
-            title: "Médiathèque",
-            href: '/admin/media',
-            icon: Image,
-        },
-        {
-            title: "Paramètres",
-            href: '/admin/settings',
-            icon: Settings,
-        },
-    ];
+    const groups = groupsFor(auth.roles)
+        .map((group) => ({
+            ...group,
+            items: group.items.filter((item) => !item.permission || isAdmin || auth.permissions.includes(item.permission)),
+        }))
+        .filter((group) => group.items.length > 0);
 
     return (
         <Sidebar collapsible="icon" variant="inset">
@@ -164,20 +194,9 @@ export function AppSidebar() {
             </SidebarHeader>
 
             <SidebarContent>
-                {/* Navigation principale */}
-                <NavMain items={mainNavItems} label="Menu" />
-
-                {/* Gestion des données académiques */}
-                <NavCollapsible items={masterDataItems} label="Académique" />
-
-                {/* PPDB - Admission des étudiants */}
-                <NavCollapsible items={ppdbItems} label="Admission" />
-
-                {/* Contrôle des accès */}
-                <NavCollapsible items={userManagementItems} label="Contrôle des accès" />
-
-                {/* Administration système */}
-                <NavMain items={systemItems} label="Système" />
+                {groups.map((group) => (
+                    <NavMain key={group.label} items={group.items} label={group.label} />
+                ))}
             </SidebarContent>
 
             <SidebarFooter>

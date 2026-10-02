@@ -18,7 +18,11 @@ return Application::configure(basePath: dirname(__DIR__))
             Route::middleware('web')
                 ->group(base_path('routes/admin.php'));
             Route::middleware('web')
-                ->group(base_path('routes/master.php'));
+                ->group(base_path('routes/agent.php'));
+            Route::middleware('web')
+                ->group(base_path('routes/challenger.php'));
+            Route::middleware('web')
+                ->group(base_path('routes/participant.php'));
         },
     )
     ->withMiddleware(function (Middleware $middleware): void {

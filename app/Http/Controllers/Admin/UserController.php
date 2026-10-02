@@ -104,6 +104,10 @@ class UserController extends Controller
             return back()->with('error', 'You cannot delete yourself.');
         }
 
+        if ($user->attempts()->exists() || $user->participations()->exists()) {
+            return back()->with('error', 'Cet utilisateur a un historique de concours et ne peut pas être supprimé.');
+        }
+
         $user->delete();
 
         return redirect()->route('admin.users.index')

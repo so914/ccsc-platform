@@ -4,21 +4,17 @@ import { initReactI18next } from 'react-i18next';
 
 import enCommon from '@/locales/en/common.json';
 import enAdmin from '@/locales/en/admin.json';
-import enPpdb from '@/locales/en/ppdb.json';
 import idCommon from '@/locales/id/common.json';
 import idAdmin from '@/locales/id/admin.json';
-import idPpdb from '@/locales/id/ppdb.json';
 
 const resources = {
     en: {
         common: enCommon,
         admin: enAdmin,
-        ppdb: enPpdb,
     },
     id: {
         common: idCommon,
         admin: idAdmin,
-        ppdb: idPpdb,
     },
 };
 
@@ -29,7 +25,7 @@ i18n.use(LanguageDetector)
         lng: 'id',
         fallbackLng: 'id',
         defaultNS: 'common',
-        ns: ['common', 'admin', 'ppdb'],
+        ns: ['common', 'admin'],
         interpolation: {
             escapeValue: false,
         },

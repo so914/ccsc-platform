@@ -1,95 +1,57 @@
 <?php
 
 use App\Models\User;
-use Spatie\Permission\Models\Permission;
-use Spatie\Permission\Models\Role;
+use Database\Seeders\RolesAndPermissionsSeeder;
+
+beforeEach(function () {
+    $this->seed(RolesAndPermissionsSeeder::class);
+});
 
 test('guests are redirected to the login page', function () {
     $this->get(route('dashboard'))->assertRedirect(route('login'));
 });
 
-test('authenticated users can visit the dashboard', function () {
-    $this->actingAs($user = User::factory()->create());
+test('admin sees the admin dashboard', function () {
+    $user = User::factory()->create();
+    $user->assignRole('admin');
 
-    $this->get(route('dashboard'))->assertOk();
+    $this->actingAs($user)->get(route('dashboard'))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page->component('dashboards/admin')->has('stats')->has('recentActivities'));
 });
 
-test('dashboard displays stats correctly', function () {
+test('agent sees the agent dashboard', function () {
     $user = User::factory()->create();
+    $user->assignRole('agent');
 
-    $response = $this->actingAs($user)
-        ->get(route('dashboard'));
-
-    $response->assertOk();
-    $response->assertInertia(fn ($page) => $page
-        ->component('dashboard')
-        ->has('stats')
-        ->has('recentActivities')
-    );
+    $this->actingAs($user)->get(route('dashboard'))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page->component('dashboards/agent')->has('stats'));
 });
 
-test('dashboard stats counts users correctly', function () {
-    // Create users
-    User::factory()->count(5)->create();
+test('challenger sees the challenger dashboard', function () {
     $user = User::factory()->create();
+    $user->assignRole('challenger');
 
-    $response = $this->actingAs($user)
-        ->get(route('dashboard'));
-
-    $response->assertOk();
-    $response->assertInertia(fn ($page) => $page
-        ->component('dashboard')
-        ->where('stats.total_users', 6) // 5 + 1 acting user
-    );
+    $this->actingAs($user)->get(route('dashboard'))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page->component('dashboards/challenger')->has('stats'));
 });
 
-test('dashboard stats counts roles correctly', function () {
+test('participant sees the participant dashboard', function () {
     $user = User::factory()->create();
-    Role::create(['name' => 'test-role']);
+    $user->assignRole('participant');
 
-    $response = $this->actingAs($user)
-        ->get(route('dashboard'));
-
-    $response->assertOk();
-    $response->assertInertia(fn ($page) => $page
-        ->component('dashboard')
-        ->has('stats.total_roles')
-    );
+    $this->actingAs($user)->get(route('dashboard'))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page->component('dashboards/participant')->has('stats'));
 });
 
-test('dashboard stats counts permissions correctly', function () {
-    $user = User::factory()->create();
-    Permission::create(['name' => 'test-permission']);
+test('admin dashboard counts challengers', function () {
+    User::factory()->count(3)->create()->each->assignRole('challenger');
+    $admin = User::factory()->create();
+    $admin->assignRole('admin');
 
-    $response = $this->actingAs($user)
-        ->get(route('dashboard'));
-
-    $response->assertOk();
-    $response->assertInertia(fn ($page) => $page
-        ->component('dashboard')
-        ->has('stats.total_permissions')
-    );
-});
-
-test('dashboard shows recent users count', function () {
-    $user = User::factory()->create();
-
-    // Create users within the last 7 days
-    User::factory()->count(3)->create([
-        'created_at' => now()->subDays(3),
-    ]);
-
-    // Create users older than 7 days
-    User::factory()->count(2)->create([
-        'created_at' => now()->subDays(10),
-    ]);
-
-    $response = $this->actingAs($user)
-        ->get(route('dashboard'));
-
-    $response->assertOk();
-    $response->assertInertia(fn ($page) => $page
-        ->component('dashboard')
-        ->where('stats.recent_users', 4) // 3 recent + acting user
-    );
+    $this->actingAs($admin)->get(route('dashboard'))
+        ->assertInertia(fn ($page) => $page->where('stats.challengers', 3));
 });
